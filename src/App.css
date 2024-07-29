@@ -1,0 +1,158 @@
+/* General Styles */
+body {
+  background-color: black;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container Styles */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+  padding: 5rem;
+}
+
+/* Card Styles */
+.card {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Heading Styles */
+h1 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #000;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* Form Label Styles */
+.form-label {
+  color: #863131;
+  font-weight: bold;
+}
+
+/* Form Group */
+.form-group {
+  margin-bottom: 1rem;
+  color: #000000;
+  font-weight: bold;
+}
+
+/* Form Control Styles */
+.form-control {
+  background-color: #f9f9f9;
+  border: 1px solid #000000;
+  color: #010101;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-control::placeholder {
+  color: #888;
+}
+
+/* Invalid Input Styles */
+.form-control.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  color: #dc3545;
+  font-size: 0.875rem;
+}
+
+.error {
+  color: #dc3545;
+}
+
+/* Button Container Styles */
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: #000000;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #000000f1;
+}
+
+/* Spinner Overlay Styles */
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.spinner-border {
+  border-top-color: white;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #ffffff; /* Fondo blanco */
+  padding: 2px; /* Padding alrededor del navbar */
+}
+
+/* Logo del Navbar */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo-img {
+  max-height: 50px;
+  width: auto;
+}
+
+/* Enlaces del Navbar */
+.navbar-nav {
+  margin-left: auto;
+}
+
+/* Enlace del Navbar */
+.nav-link {
+  color: #000000;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: #000;
+  color: #ffffff;
+  padding: 0.7rem;
+  border-radius: 5px;
+}
+
+.nav-link.active {
+  font-weight: bold; /* Enlace activo en negrita */
+}
