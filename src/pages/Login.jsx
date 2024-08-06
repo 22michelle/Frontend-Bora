@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setToken, setUser } from "../redux/authSlice";
+import { setUser } from "../redux/authSlice"; // Only import setUser
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import { Spinner } from "react-bootstrap";
@@ -34,7 +34,7 @@ export default function Login() {
   const loginUser = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
-
+  
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       for (const [key, message] of Object.entries(validationErrors)) {
@@ -42,10 +42,10 @@ export default function Login() {
       }
       return;
     }
-
+  
     setLoading(true);
     setErrors({});
-
+  
     try {
       const response = await axios.post(
         "https://backend-bora.onrender.com/user/login",
@@ -55,18 +55,21 @@ export default function Login() {
           headers: { "Content-Type": "application/json" },
         }
       );
-
+  
       const responseData = response.data;
-
+  
+      console.log("Response Data:", responseData); // Log response for debugging
+  
       if (!responseData.ok) {
         toast.error(responseData.message || "Login Failed");
       } else {
-        dispatch(setToken(responseData.token));
-        dispatch(setUser(responseData.user));
-        toast.success(
-          responseData.message || "Login Successful, Welcome To Bora"
-        );
-        navigate("/dashboard");
+        if (responseData.data) { // Use responseData.data instead of responseData.user
+          dispatch(setUser(responseData.data)); // Update the user state with the new data
+          toast.success(responseData.message || "Login Successful, Welcome To Bora");
+          navigate("/dashboard");
+        } else {
+          toast.error("Unexpected error: User data not found");
+        }
       }
     } catch (error) {
       console.error(
@@ -82,7 +85,7 @@ export default function Login() {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="container">
       <div className="card">

@@ -178,7 +178,7 @@ export default function Register() {
             <p className="fw-bold">
               Already have an account?{" "}
               <a className="a" href="/login">
-                Sign In
+                Login
               </a>
             </p>
           </div>
@@ -189,8 +189,9 @@ export default function Register() {
       {loading && (
         <div className="overlay">
           <div className="spinner-container">
-          <span className="ms-2">Wait A Few Minutes...</span>
-            <Spinner animation="border" variant="light" />
+            <span className="ms-2">Wait A Few Minutes...</span>
+            <br />
+            <Spinner animation="border mt-2" variant="light" />
           </div>
         </div>
       )}
