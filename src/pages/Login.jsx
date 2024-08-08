@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
@@ -34,7 +35,7 @@ export default function Login() {
   const loginUser = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
-  
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       for (const [key, message] of Object.entries(validationErrors)) {
@@ -42,10 +43,10 @@ export default function Login() {
       }
       return;
     }
-  
+
     setLoading(true);
     setErrors({});
-  
+
     try {
       const response = await axios.post(
         "https://backend-bora.onrender.com/user/login",
@@ -55,17 +56,20 @@ export default function Login() {
           headers: { "Content-Type": "application/json" },
         }
       );
-  
+
       const responseData = response.data;
-  
+
       console.log("Response Data:", responseData); // Log response for debugging
-  
+
       if (!responseData.ok) {
         toast.error(responseData.message || "Login Failed");
       } else {
-        if (responseData.data) { // Use responseData.data instead of responseData.user
+        if (responseData.data) {
+          // Use responseData.data instead of responseData.user
           dispatch(setUser(responseData.data)); // Update the user state with the new data
-          toast.success(responseData.message || "Login Successful, Welcome To Bora");
+          toast.success(
+            responseData.message || "Login Successful, Welcome To Bora"
+          );
           navigate("/dashboard");
         } else {
           toast.error("Unexpected error: User data not found");
@@ -85,7 +89,7 @@ export default function Login() {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="container">
       <div className="card">
@@ -131,10 +135,7 @@ export default function Login() {
           {/* Don't have an account? */}
           <div className="mt-3 text-center">
             <p className="fw-bold">
-              Don't have an account?{" "}
-              <a className="a" href="/register">
-                Sign up
-              </a>
+              Don't have an account? <Link to="/register">Register</Link>
             </p>
           </div>
         </form>

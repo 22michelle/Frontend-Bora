@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Spinner from "react-bootstrap/Spinner";
@@ -177,9 +178,7 @@ export default function Register() {
           <div className="mt-3 text-center">
             <p className="fw-bold">
               Already have an account?{" "}
-              <a className="a" href="/login">
-                Login
-              </a>
+              <Link to="/login">Login</Link>
             </p>
           </div>
         </form>
