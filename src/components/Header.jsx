@@ -1,22 +1,10 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../redux/actions/authActions,js";
+import { Link } from "react-router-dom";
 import "../App.css";
-import { Button } from "react-bootstrap";
 import logo from "../../src/assets/logo2.png";
+import { Button } from "react-bootstrap";
 
 export default function Header() {
-  const { token } = useSelector((state) => state.auth);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const handleLogout = () => {
-    dispatch(logout());
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
       <div className="container-fluid">
@@ -37,31 +25,34 @@ export default function Header() {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
-            {!token ? (
-              <>
-                <li className="nav-item">
-                  <a className="nav-link mx-auto" href="/">
-                    Home
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link mx-auto" href="/register">
-                    Register
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link mx-auto" href="/login">
-                    Login
-                  </a>
-                </li>
-              </>
-            ) : (
+            <>
               <li className="nav-item">
-                <Button className="nav-link text-white" onClick={handleLogout}>
-                  Logout
+                <Button className="nav-link mx-auto" to="/">
+                  <Link to="/" className="text-decoration-none text-white">
+                    {" "}
+                    Home
+                  </Link>
                 </Button>
               </li>
-            )}
+              <li className="nav-item">
+                <Button className="nav-link mx-auto" to="/register">
+                  <Link
+                    to="/register"
+                    className="text-decoration-none text-white"
+                  >
+                    Register
+                  </Link>
+                </Button>
+              </li>
+              <li className="nav-item">
+                <Button className="nav-link mx-auto" to="/login">
+                  <Link to="/login" className="text-decoration-none text-white">
+                    {" "}
+                    Login
+                  </Link>
+                </Button>
+              </li>
+            </>
           </ul>
         </div>
       </div>
