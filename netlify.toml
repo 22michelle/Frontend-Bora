@@ -4,6 +4,7 @@ publish = "/build"
 base = "/"
 
 [[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
+  from = "/api/*"
+  to = "https://backend-bora.onrender.com"
+  status = 200
+  force = true
