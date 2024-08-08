@@ -4,7 +4,7 @@ import { Container, Row, Col } from "react-bootstrap";
 
 export default function Home() {
   return (
-    <Container className="home-container text-center">
+    <Container className="w-auto text-center">
       <Row className=" card mx-auto">
         <h1 className="display-3 mb-4">Welcome to Bora!</h1>
         <p className=" mb-4">

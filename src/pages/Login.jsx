@@ -135,7 +135,10 @@ export default function Login() {
           {/* Don't have an account? */}
           <div className="mt-3 text-center">
             <p className="fw-bold">
-              Don't have an account? <Link to="/register">Register</Link>
+              Don't have an account?{" "}
+              <Link to="/register" className="text-black">
+                Register
+              </Link>
             </p>
           </div>
         </form>

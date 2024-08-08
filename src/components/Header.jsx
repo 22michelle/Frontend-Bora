@@ -25,34 +25,32 @@ export default function Header() {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
-            <>
-              <li className="nav-item">
-                <Button className="nav-link mx-auto" to="/">
-                  <Link to="/" className="text-decoration-none text-white">
-                    {" "}
-                    Home
-                  </Link>
-                </Button>
-              </li>
-              <li className="nav-item">
-                <Button className="nav-link mx-auto" to="/register">
-                  <Link
-                    to="/register"
-                    className="text-decoration-none text-white"
-                  >
-                    Register
-                  </Link>
-                </Button>
-              </li>
-              <li className="nav-item">
-                <Button className="nav-link mx-auto" to="/login">
-                  <Link to="/login" className="text-decoration-none text-white">
-                    {" "}
-                    Login
-                  </Link>
-                </Button>
-              </li>
-            </>
+            <li className="nav-item">
+              <Button className="nav-link mx-auto" to="/">
+                <Link to="/" className="text-decoration-none text-white">
+                  {" "}
+                  Home
+                </Link>
+              </Button>
+            </li>
+            <li className="nav-item">
+              <Button className="nav-link mx-auto" to="/register">
+                <Link
+                  to="/register"
+                  className="text-decoration-none text-white"
+                >
+                  Register
+                </Link>
+              </Button>
+            </li>
+            <li className="nav-item">
+              <Button className="nav-link mx-auto" to="/login">
+                <Link to="/login" className="text-decoration-none text-white">
+                  {" "}
+                  Login
+                </Link>
+              </Button>
+            </li>
           </ul>
         </div>
       </div>
