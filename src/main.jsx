@@ -6,6 +6,8 @@ import App from "./App.jsx";
 import "./App.css";
 import { BrowserRouter as Router } from "react-router-dom";
 
+axios.defaults.baseURL = "https://backend-bora.onrender.com";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
