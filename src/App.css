@@ -46,21 +46,27 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   max-width: 500px;
   width: 100%;
-  margin: 0 auto; /* Centra la tarjeta horizontalmente */
+  margin: 0 auto;
 }
 
 /* Responsive Styles */
 @media (max-width: 768px) {
   .card {
-    padding: 1.5rem; /* Reducir el padding en pantallas medianas */
-    max-width: 90%; /* Asegurar que la tarjeta no se extienda demasiado en pantallas pequeñas */
+    padding: 1.5rem;
+    max-width: 90%;
   }
 }
 
 @media (max-width: 576px) {
   .card {
-    padding: 1rem; /* Reducir aún más el padding en pantallas pequeñas */
-    max-width: 100%; /* Permitir que la tarjeta ocupe todo el ancho disponible */
+    padding: 1rem;
+    max-width: 100%;
+  }
+}
+@media (max-width: 384px) {
+  .card {
+    padding: 0.75rem;
+    max-width: 100%;
   }
 }
 

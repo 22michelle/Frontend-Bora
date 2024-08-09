@@ -5,6 +5,15 @@ import logo from "../../src/assets/logo2.png";
 import { Button } from "react-bootstrap";
 
 export default function Header() {
+  // Function to close the toggler
+  const closeToggler = () => {
+    const toggler = document.querySelector('.navbar-toggler');
+    const collapse = document.querySelector('#navbarNav');
+    if (collapse.classList.contains('show')) {
+      toggler.click();
+    }
+  };
+
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
       <div className="container-fluid">
@@ -29,6 +38,7 @@ export default function Header() {
               <Link
                 to="/"
                 className="nav-link text-center mx-auto text-decoration-none text-white"
+                onClick={closeToggler}
               >
                 Home
               </Link>
@@ -37,6 +47,7 @@ export default function Header() {
               <Link
                 to="/register"
                 className="nav-link text-center mx-auto text-decoration-none text-white"
+                onClick={closeToggler}
               >
                 Register
               </Link>
@@ -44,7 +55,8 @@ export default function Header() {
             <li className="nav-item">
               <Link
                 to="/login"
-                className="nav-link text-center mx-auto text-decoration-none text-white"
+                className="nav-link text-center mx-auto text-decoration-none text-white mb-2"
+                onClick={closeToggler}
               >
                 Login
               </Link>
