@@ -34,7 +34,6 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-
       try {
         if (!userId) {
           throw new Error("No user ID found");
@@ -46,7 +45,6 @@ export default function Dashboard() {
             withCredentials: true,
           }
         );
-
         setUser(userResponse.data.data);
 
         if (transactionId) {
@@ -56,7 +54,6 @@ export default function Dashboard() {
               withCredentials: true,
             }
           );
-
           setTransactions([transactionsResponse.data.data]);
         } else {
           toast.error("Transaction ID is not defined");
@@ -103,8 +100,11 @@ export default function Dashboard() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.senderAccountNumber || !formData.receiverAccountNumber || !formData.amount || !formData.feeRate) {
+      toast.error("Please fill out all fields.");
+      return;
+    }
     try {
-      // Handle form submission logic here
       console.log("Send form submitted with data:", formData);
       await axios.post(
         "https://backend-bora.onrender.com/transaction/transaction",
@@ -123,10 +123,14 @@ export default function Dashboard() {
 
   const handleDeposit = async (e) => {
     e.preventDefault();
+    if (!depositData.amount || depositData.amount <= 0) {
+      toast.error("Please enter a valid amount.");
+      return;
+    }
     try {
       console.log("Deposit form submitted with data:", depositData);
       await axios.post(
-        "https://backend-bora.onrender.com/transaction/transaction", // Ensure this endpoint is correct
+        "https://backend-bora.onrender.com/deposit", // Make sure this endpoint is correct
         depositData,
         {
           withCredentials: true,
@@ -142,12 +146,21 @@ export default function Dashboard() {
 
   const handleTransfer = async (e) => {
     e.preventDefault();
+    console.log("Transfer data:", transferData);
+    if (!transferData.receiverAccountNumber || !transferData.amount || transferData.amount <= 0) {
+      toast.error("Please fill out all fields with valid values.");
+      return;
+    }
+    if (!user || transferData.amount > user.balance) {
+      toast.error("Insufficient balance");
+      return;
+    }
     try {
       console.log("Transfer form submitted with data:", transferData);
       await axios.post(
-        "https://backend-bora.onrender.com/transaction/Transaction",
+        "https://backend-bora.onrender.com/transaction/transaction",
         transferData,
-        {
+        { 
           withCredentials: true,
         }
       );
@@ -244,150 +257,136 @@ export default function Dashboard() {
               <div className="transactions-section">
                 {transactions.length > 0 ? (
                   <ul>
-                    {transactions.map((transaction) => (
+                    {transactions.map((transactionHistory) => (
                       <li key={transaction._id}>
-                        {new Date(transaction.createdAt).toLocaleDateString()} -
-                        ${transaction.amount}
+                        {new Date(transaction.createdAt).toLocaleDateString()} - 
+                        {transaction.amount} - 
+                        {transaction.description}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p>No transactions found.</p>
+                  <p>No transactions available.</p>
                 )}
               </div>
             </div>
           </div>
+
+          {/* Send Modal */}
+          <Modal show={showSendModal} onHide={() => handleCloseModal("send")}>
+            <Modal.Header closeButton>
+              <Modal.Title>Send Transaction</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="senderAccountNumber">
+                  <Form.Label>Sender Account Number</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="senderAccountNumber"
+                    value={formData.senderAccountNumber}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group controlId="receiverAccountNumber">
+                  <Form.Label>Receiver Account Number</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="receiverAccountNumber"
+                    value={formData.receiverAccountNumber}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group controlId="amount">
+                  <Form.Label>Amount</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group controlId="feeRate">
+                  <Form.Label>Fee Rate</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="feeRate"
+                    value={formData.feeRate}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                  Submit
+                </Button>
+              </Form>
+            </Modal.Body>
+          </Modal>
+
+          {/* Deposit Modal */}
+          <Modal show={showDepositModal} onHide={() => handleCloseModal("deposit")}>
+            <Modal.Header closeButton>
+              <Modal.Title>Deposit</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form onSubmit={handleDeposit}>
+                <Form.Group controlId="amount">
+                  <Form.Label>Amount</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="amount"
+                    value={depositData.amount}
+                    onChange={handleDepositChange}
+                    required
+                  />
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                  Submit
+                </Button>
+              </Form>
+            </Modal.Body>
+          </Modal>
+
+          {/* Transfer Modal */}
+          <Modal show={showTransferModal} onHide={() => handleCloseModal("transfer")}>
+            <Modal.Header closeButton>
+              <Modal.Title>Transfer</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form onSubmit={handleTransfer}>
+                <Form.Group controlId="receiverAccountNumber">
+                  <Form.Label>Receiver Account Number</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="receiverAccountNumber"
+                    value={transferData.receiverAccountNumber}
+                    onChange={handleTransferChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group controlId="amount">
+                  <Form.Label>Amount</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="amount"
+                    value={transferData.amount}
+                    onChange={handleTransferChange}
+                    required
+                  />
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                  Submit
+                </Button>
+              </Form>
+            </Modal.Body>
+          </Modal>
         </div>
       ) : (
-        <div className="card mx-auto">
-          <h1>Unauthorized Access</h1>
-          <p>Please log in to view this page.</p>
-          <Button href="/login" className="btn btn-primary">
-            Go to Login
-          </Button>
-        </div>
+        <p>No user data available</p>
       )}
-      {/* Send Modal */}
-      <Modal show={showSendModal} onHide={() => handleCloseModal("send")}>
-        <Modal.Header closeButton>
-          <Modal.Title className="text-black">Send Funds</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="formSenderAccountNumber">
-              <Form.Label className="text-black">
-                Sender Account Number
-              </Form.Label>
-              <Form.Control
-                type="text"
-                name="senderAccountNumber"
-                value={formData.senderAccountNumber}
-                onChange={handleInputChange}
-                placeholder="Enter sender account number"
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formReceiverAccountNumber">
-              <Form.Label className="text-black">
-                Receiver Account Number
-              </Form.Label>
-              <Form.Control
-                type="text"
-                name="receiverAccountNumber"
-                value={formData.receiverAccountNumber}
-                onChange={handleInputChange}
-                placeholder="Enter receiver account number"
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formAmount">
-              <Form.Label className="text-black">Amount</Form.Label>
-              <Form.Control
-                type="number"
-                name="amount"
-                value={formData.amount}
-                onChange={handleInputChange}
-                placeholder="Enter amount"
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formFeeRate">
-              <Form.Label className="text-black">Fee Rate</Form.Label>
-              <Form.Control
-                type="number"
-                name="feeRate"
-                value={formData.feeRate}
-                onChange={handleInputChange}
-                placeholder="Enter fee rate"
-              />
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Send
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
-      {/* Deposit Modal */}
-      <Modal show={showDepositModal} onHide={() => handleCloseModal("deposit")}>
-        <Modal.Header closeButton>
-          <Modal.Title className="text-black">Deposit Funds</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleDeposit}>
-            <Form.Group className="mb-3" controlId="formDepositAmount">
-              <Form.Label className="text-black">Amount</Form.Label>
-              <Form.Control
-                type="number"
-                name="amount"
-                value={depositData.amount}
-                onChange={handleDepositChange}
-                placeholder="Enter amount"
-              />
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Deposit
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
-      {/* Transfer Modal */}
-      <Modal
-        show={showTransferModal}
-        onHide={() => handleCloseModal("transfer")}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title className="text-black">Transfer Funds</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleTransfer}>
-            <Form.Group
-              className="mb-3"
-              controlId="formTransferReceiverAccountNumber"
-            >
-              <Form.Label className="text-black">
-                Receiver Account Number
-              </Form.Label>
-              <Form.Control
-                type="text"
-                name="receiverAccountNumber"
-                value={transferData.receiverAccountNumber}
-                onChange={handleTransferChange}
-                placeholder="Enter receiver account number"
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formTransferAmount">
-              <Form.Label className="text-black">Amount</Form.Label>
-              <Form.Control
-                type="number"
-                name="amount"
-                value={transferData.amount}
-                onChange={handleTransferChange}
-                placeholder="Enter amount"
-              />
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Transfer
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
     </div>
   );
 }

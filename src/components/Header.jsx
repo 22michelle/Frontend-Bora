@@ -17,7 +17,7 @@ export default function Header() {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
+        <Link className="navbar-brand" to="/" onClick={closeToggler}>
           <img src={logo} alt="Bora" className="navbar-logo-img" />
           <h2 className="mt-2">Bora</h2>
         </Link>
