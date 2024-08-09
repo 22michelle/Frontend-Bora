@@ -26,30 +26,28 @@ export default function Header() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Button className="nav-link mx-auto" to="/">
-                <Link to="/" className="text-decoration-none text-white">
-                  {" "}
-                  Home
-                </Link>
-              </Button>
+              <Link
+                to="/"
+                className="nav-link text-center mx-auto text-decoration-none text-white"
+              >
+                Home
+              </Link>
             </li>
             <li className="nav-item">
-              <Button className="nav-link mx-auto" to="/register">
-                <Link
-                  to="/register"
-                  className="text-decoration-none text-white"
-                >
-                  Register
-                </Link>
-              </Button>
+              <Link
+                to="/register"
+                className="nav-link text-center mx-auto text-decoration-none text-white"
+              >
+                Register
+              </Link>
             </li>
             <li className="nav-item">
-              <Button className="nav-link mx-auto" to="/login">
-                <Link to="/login" className="text-decoration-none text-white">
-                  {" "}
-                  Login
-                </Link>
-              </Button>
+              <Link
+                to="/login"
+                className="nav-link text-center mx-auto text-decoration-none text-white"
+              >
+                Login
+              </Link>
             </li>
           </ul>
         </div>
