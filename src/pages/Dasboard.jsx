@@ -13,7 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import "./styles.css";
-import HeaderLogout from "../components/Logout";
+import HeaderLogout from "../components/Logout.jsx";
 
 export default function Dashboard() {
   const userId = useSelector((state) => state.auth.userId);

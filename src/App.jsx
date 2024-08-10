@@ -1,10 +1,10 @@
 import "./App.css";
 import { Routes, Route, useLocation } from "react-router-dom";
-import Header from "./components/Header";
-import Home from "../src/pages/Home";
-import Login from "../src/pages/Login";
-import Register from "../src/pages/Register";
-import Dashboard from "./pages/Dasboard";
+import Header from "./components/Header.jsx";
+import Home from "../src/pages/Home.jsx";
+import Login from "../src/pages/Login.jsx";
+import Register from "../src/pages/Register.jsx";
+import Dashboard from "./pages/Dasboard.jsx";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
 
