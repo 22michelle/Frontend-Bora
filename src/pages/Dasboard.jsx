@@ -3,7 +3,14 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { Spinner, Button, Modal, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHands } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHands,
+  faWallet,
+  faFileInvoiceDollar,
+  faArrowUp,
+  faArrowDown,
+  faMoneyBill,
+} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import "./styles.css";
 import HeaderLogout from "../components/Logout";
@@ -39,24 +46,21 @@ export default function Dashboard() {
           throw new Error("No user ID found");
         }
 
-        const userResponse = await axios.get(
-          `https://backend-bora.onrender.com/user/${userId}`,
-          {
+        const [userResponse, transactionsResponse] = await Promise.all([
+          axios.get(`https://backend-bora.onrender.com/user/${userId}`, {
             withCredentials: true,
-          }
-        );
-        setUser(userResponse.data.data);
+          }),
+          transactionId
+            ? axios.get(
+                `https://backend-bora.onrender.com/transaction/${transactionId}`,
+                { withCredentials: true }
+              )
+            : Promise.resolve({ data: { data: [] } }),
+        ]);
 
+        setUser(userResponse.data.data);
         if (transactionId) {
-          const transactionsResponse = await axios.get(
-            `https://backend-bora.onrender.com/transaction/${transactionId}`,
-            {
-              withCredentials: true,
-            }
-          );
           setTransactions([transactionsResponse.data.data]);
-        } else {
-          toast.error("Transaction ID is not defined");
         }
       } catch (error) {
         console.error("Error:", error);
@@ -72,46 +76,62 @@ export default function Dashboard() {
   }, [userId, transactionId]);
 
   const handleShowModal = (modal) => {
-    if (modal === "send") setShowSendModal(true);
-    if (modal === "deposit") setShowDepositModal(true);
-    if (modal === "transfer") setShowTransferModal(true);
+    switch (modal) {
+      case "send":
+        setShowSendModal(true);
+        break;
+      case "deposit":
+        setShowDepositModal(true);
+        break;
+      case "transfer":
+        setShowTransferModal(true);
+        break;
+      default:
+        break;
+    }
   };
 
   const handleCloseModal = (modal) => {
-    if (modal === "send") setShowSendModal(false);
-    if (modal === "deposit") setShowDepositModal(false);
-    if (modal === "transfer") setShowTransferModal(false);
+    switch (modal) {
+      case "send":
+        setShowSendModal(false);
+        break;
+      case "deposit":
+        setShowDepositModal(false);
+        break;
+      case "transfer":
+        setShowTransferModal(false);
+        break;
+      default:
+        break;
+    }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, stateSetter) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleDepositChange = (e) => {
-    const { name, value } = e.target;
-    setDepositData({ ...depositData, [name]: value });
-  };
-
-  const handleTransferChange = (e) => {
-    const { name, value } = e.target;
-    setTransferData({ ...transferData, [name]: value });
+    stateSetter((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.senderAccountNumber || !formData.receiverAccountNumber || !formData.amount || !formData.feeRate) {
+    const { senderAccountNumber, receiverAccountNumber, amount, feeRate } =
+      formData;
+
+    if (!senderAccountNumber || !receiverAccountNumber || !amount || !feeRate) {
       toast.error("Please fill out all fields.");
       return;
     }
+
+    if (amount <= 0) {
+      toast.error("Amount must be greater than zero.");
+      return;
+    }
+
     try {
-      console.log("Send form submitted with data:", formData);
       await axios.post(
         "https://backend-bora.onrender.com/transaction/transaction",
         formData,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       toast.success("Transaction created successfully");
       handleCloseModal("send");
@@ -123,18 +143,18 @@ export default function Dashboard() {
 
   const handleDeposit = async (e) => {
     e.preventDefault();
-    if (!depositData.amount || depositData.amount <= 0) {
+    const { amount } = depositData;
+
+    if (!amount || amount <= 0) {
       toast.error("Please enter a valid amount.");
       return;
     }
+
     try {
-      console.log("Deposit form submitted with data:", depositData);
       await axios.post(
-        "https://backend-bora.onrender.com/deposit", // Make sure this endpoint is correct
+        "https://backend-bora.onrender.com/deposit", // Ensure this endpoint is correct
         depositData,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       toast.success("Deposit successful");
       handleCloseModal("deposit");
@@ -146,23 +166,23 @@ export default function Dashboard() {
 
   const handleTransfer = async (e) => {
     e.preventDefault();
-    console.log("Transfer data:", transferData);
-    if (!transferData.receiverAccountNumber || !transferData.amount || transferData.amount <= 0) {
+    const { receiverAccountNumber, amount } = transferData;
+
+    if (!receiverAccountNumber || !amount || amount <= 0) {
       toast.error("Please fill out all fields with valid values.");
       return;
     }
-    if (!user || transferData.amount > user.balance) {
+
+    if (!user || amount > user.balance) {
       toast.error("Insufficient balance");
       return;
     }
+
     try {
-      console.log("Transfer form submitted with data:", transferData);
       await axios.post(
         "https://backend-bora.onrender.com/transaction/transaction",
         transferData,
-        { 
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       toast.success("Transfer successful");
       handleCloseModal("transfer");
@@ -187,7 +207,6 @@ export default function Dashboard() {
               Welcome, {user.name}!
               <FontAwesomeIcon icon={faHands} className="ms-2" />
             </h1>
-            {/* Info User */}
             <div className="balance-section">
               <div className="row g-2">
                 <div className="p-3 border bg-light">
@@ -215,6 +234,7 @@ export default function Dashboard() {
                           onClick={() => handleShowModal("send")}
                           className="btn btn-primary"
                         >
+                          <FontAwesomeIcon icon={faArrowUp} className="me-2" />
                           Send
                         </Button>
                       </div>
@@ -223,6 +243,7 @@ export default function Dashboard() {
                           onClick={() => handleShowModal("deposit")}
                           className="btn btn-primary"
                         >
+                          <FontAwesomeIcon icon={faWallet} className="me-2" />
                           Deposit
                         </Button>
                       </div>
@@ -231,6 +252,10 @@ export default function Dashboard() {
                           onClick={() => handleShowModal("transfer")}
                           className="btn btn-primary"
                         >
+                          <FontAwesomeIcon
+                            icon={faArrowDown}
+                            className="me-2"
+                          />
                           Transfer
                         </Button>
                       </div>
@@ -239,7 +264,6 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-            {/* Transaction History */}
             <div className="row g-2">
               <div className="row g-2">
                 <div className="col-6">
@@ -257,11 +281,9 @@ export default function Dashboard() {
               <div className="transactions-section">
                 {transactions.length > 0 ? (
                   <ul>
-                    {transactions.map((transactionHistory) => (
+                    {transactions.map((transaction) => (
                       <li key={transaction._id}>
-                        {new Date(transaction.createdAt).toLocaleDateString()} - 
-                        {transaction.amount} - 
-                        {transaction.description}
+                        {new Date(transaction.createdAt).toLocaleDateString()} -
                       </li>
                     ))}
                   </ul>
@@ -272,51 +294,57 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Send Modal */}
           <Modal show={showSendModal} onHide={() => handleCloseModal("send")}>
             <Modal.Header closeButton>
-              <Modal.Title>Send Transaction</Modal.Title>
+              <Modal.Title className="text-black">
+                <FontAwesomeIcon icon={faArrowUp} className="me-2" />
+                Send
+              </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="senderAccountNumber">
-                  <Form.Label>Sender Account Number</Form.Label>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-black">
+                    Sender Account Number
+                  </Form.Label>
                   <Form.Control
                     type="text"
+                    placeholder="Enter sender account number"
                     name="senderAccountNumber"
                     value={formData.senderAccountNumber}
-                    onChange={handleInputChange}
-                    required
+                    onChange={(e) => handleInputChange(e, setFormData)}
                   />
                 </Form.Group>
-                <Form.Group controlId="receiverAccountNumber">
-                  <Form.Label>Receiver Account Number</Form.Label>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-black">
+                    Receiver Account Number
+                  </Form.Label>
                   <Form.Control
                     type="text"
+                    placeholder="Enter receiver account number"
                     name="receiverAccountNumber"
                     value={formData.receiverAccountNumber}
-                    onChange={handleInputChange}
-                    required
+                    onChange={(e) => handleInputChange(e, setFormData)}
                   />
                 </Form.Group>
-                <Form.Group controlId="amount">
-                  <Form.Label>Amount</Form.Label>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-black">Amount</Form.Label>
                   <Form.Control
                     type="number"
+                    placeholder="Enter amount"
                     name="amount"
                     value={formData.amount}
-                    onChange={handleInputChange}
-                    required
+                    onChange={(e) => handleInputChange(e, setFormData)}
                   />
                 </Form.Group>
-                <Form.Group controlId="feeRate">
-                  <Form.Label>Fee Rate</Form.Label>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-black">Fee Rate</Form.Label>
                   <Form.Control
                     type="number"
+                    placeholder="Enter fee rate"
                     name="feeRate"
                     value={formData.feeRate}
-                    onChange={handleInputChange}
-                    required
+                    onChange={(e) => handleInputChange(e, setFormData)}
                   />
                 </Form.Group>
                 <Button variant="primary" type="submit">
@@ -326,66 +354,78 @@ export default function Dashboard() {
             </Modal.Body>
           </Modal>
 
-          {/* Deposit Modal */}
-          <Modal show={showDepositModal} onHide={() => handleCloseModal("deposit")}>
+          <Modal
+            show={showDepositModal}
+            onHide={() => handleCloseModal("deposit")}
+          >
             <Modal.Header closeButton>
-              <Modal.Title>Deposit</Modal.Title>
+              <Modal.Title className="text-black">
+                <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
+                Deposit
+              </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={handleDeposit}>
-                <Form.Group controlId="amount">
-                  <Form.Label>Amount</Form.Label>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-black">Amount</Form.Label>
                   <Form.Control
                     type="number"
+                    placeholder="Enter amount"
                     name="amount"
                     value={depositData.amount}
-                    onChange={handleDepositChange}
-                    required
+                    onChange={(e) => handleInputChange(e, setDepositData)}
                   />
                 </Form.Group>
                 <Button variant="primary" type="submit">
-                  Submit
+                  Deposit
                 </Button>
               </Form>
             </Modal.Body>
           </Modal>
 
-          {/* Transfer Modal */}
-          <Modal show={showTransferModal} onHide={() => handleCloseModal("transfer")}>
+          <Modal
+            show={showTransferModal}
+            onHide={() => handleCloseModal("transfer")}
+          >
             <Modal.Header closeButton>
-              <Modal.Title>Transfer</Modal.Title>
+              <Modal.Title className="text-black">
+                <FontAwesomeIcon icon={faArrowDown} className="me-2" />
+                Transfer
+              </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={handleTransfer}>
-                <Form.Group controlId="receiverAccountNumber">
-                  <Form.Label>Receiver Account Number</Form.Label>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-black">
+                    Receiver Account Number
+                  </Form.Label>
                   <Form.Control
                     type="text"
+                    placeholder="Enter receiver account number"
                     name="receiverAccountNumber"
                     value={transferData.receiverAccountNumber}
-                    onChange={handleTransferChange}
-                    required
+                    onChange={(e) => handleInputChange(e, setTransferData)}
                   />
                 </Form.Group>
-                <Form.Group controlId="amount">
-                  <Form.Label>Amount</Form.Label>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-black">Amount</Form.Label>
                   <Form.Control
                     type="number"
+                    placeholder="Enter amount"
                     name="amount"
                     value={transferData.amount}
-                    onChange={handleTransferChange}
-                    required
+                    onChange={(e) => handleInputChange(e, setTransferData)}
                   />
                 </Form.Group>
                 <Button variant="primary" type="submit">
-                  Submit
+                  Transfer
                 </Button>
               </Form>
             </Modal.Body>
           </Modal>
         </div>
       ) : (
-        <p>No user data available</p>
+        <p>No user data available.</p>
       )}
     </div>
   );
