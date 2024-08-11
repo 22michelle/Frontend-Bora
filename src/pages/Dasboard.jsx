@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Spinner, Button, Modal, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,6 +17,8 @@ import "./styles.css";
 import HeaderLogout from "../components/Logout.jsx";
 
 export default function Dashboard() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userId = useSelector((state) => state.auth.userId);
   const transactionId = useSelector((state) => state.auth.transactionId);
   const [loading, setLoading] = useState(true);
@@ -30,50 +33,52 @@ export default function Dashboard() {
     amount: "",
     feeRate: "",
   });
+
   const [depositData, setDepositData] = useState({
     amount: "",
   });
+
   const [transferData, setTransferData] = useState({
     receiverAccountNumber: "",
     amount: "",
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        if (!userId) {
-          throw new Error("No user ID found");
+    if (!userId) {
+      navigate("/login");
+    } else {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const [userResponse, transactionsResponse] = await Promise.all([
+            axios.get(`https://backend-bora.onrender.com/user/${userId}`, {
+              withCredentials: true,
+            }),
+            transactionId
+              ? axios.get(
+                  `https://backend-bora.onrender.com/transaction/${transactionId}`,
+                  { withCredentials: true }
+                )
+              : Promise.resolve({ data: { data: [] } }),
+          ]);
+
+          setUser(userResponse.data.data);
+          if (transactionId) {
+            setTransactions([transactionsResponse.data.data]);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(
+            error.response?.data?.message || "An unexpected error occurred"
+          );
+        } finally {
+          setLoading(false);
         }
+      };
 
-        const [userResponse, transactionsResponse] = await Promise.all([
-          axios.get(`https://backend-bora.onrender.com/user/${userId}`, {
-            withCredentials: true,
-          }),
-          transactionId
-            ? axios.get(
-                `https://backend-bora.onrender.com/transaction/${transactionId}`,
-                { withCredentials: true }
-              )
-            : Promise.resolve({ data: { data: [] } }),
-        ]);
-
-        setUser(userResponse.data.data);
-        if (transactionId) {
-          setTransactions([transactionsResponse.data.data]);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        toast.error(
-          error.response?.data?.message || "An unexpected error occurred"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [userId, transactionId]);
+      fetchData();
+    }
+  }, [userId, transactionId, navigate]);
 
   const handleShowModal = (modal) => {
     switch (modal) {
@@ -196,9 +201,11 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <HeaderLogout />
       {loading ? (
-        <div className="d-flex justify-content-center align-items-center">
-          <Spinner animation="border" />
-          <span className="ms-2">Wait A Few Minutes......</span>
+        <div className="overlay">
+          <div className="spinner-container">
+            <span className="ms-2 text-light">Wait A Few Minutes...</span>
+            <Spinner animation="border" variant="light" />
+          </div>
         </div>
       ) : user ? (
         <div className="dashboard-content">
@@ -223,6 +230,7 @@ export default function Dashboard() {
                       Value: <p className="fs-3">{user.value}</p>
                     </div>
                   </div>
+                  {/* Menu Buttons */}
                   <div className="mx-auto">
                     <div
                       className="row g-2"
@@ -235,6 +243,7 @@ export default function Dashboard() {
                           className="btn btn-primary"
                         >
                           <FontAwesomeIcon icon={faArrowUp} className="me-2" />
+                          <br />
                           Send
                         </Button>
                       </div>
@@ -244,6 +253,7 @@ export default function Dashboard() {
                           className="btn btn-primary"
                         >
                           <FontAwesomeIcon icon={faWallet} className="me-2" />
+                          <br />
                           Deposit
                         </Button>
                       </div>
@@ -256,6 +266,7 @@ export default function Dashboard() {
                             icon={faArrowDown}
                             className="me-2"
                           />
+                          <br />
                           Transfer
                         </Button>
                       </div>
@@ -264,6 +275,7 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
+            {/* Transaction History */}
             <div className="row g-2">
               <div className="row g-2">
                 <div className="col-6">
@@ -294,6 +306,7 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Modals */}
           <Modal show={showSendModal} onHide={() => handleCloseModal("send")}>
             <Modal.Header closeButton>
               <Modal.Title className="text-black">
@@ -348,7 +361,7 @@ export default function Dashboard() {
                   />
                 </Form.Group>
                 <Button variant="primary" type="submit">
-                  Submit
+                  Send
                 </Button>
               </Form>
             </Modal.Body>

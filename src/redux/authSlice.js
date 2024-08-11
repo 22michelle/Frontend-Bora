@@ -24,10 +24,17 @@ const authSlice = createSlice({
       localStorage.removeItem("userId");
       localStorage.removeItem("transactionId");
     },
+    logout(state) {
+      state.user = null;
+      state.userId = null;
+      state.transactionId = null;
+      localStorage.removeItem("userId");
+      localStorage.removeItem("transactionId");
+    }
   },
 });
 
 
-export const { setUser, setTransactionId, clearUser } = authSlice.actions;
+export const { setUser, setTransactionId, clearUser, logout } = authSlice.actions;
 
 export default authSlice.reducer;
