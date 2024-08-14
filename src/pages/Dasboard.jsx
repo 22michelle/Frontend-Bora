@@ -50,21 +50,17 @@ export default function Dashboard() {
       const fetchData = async () => {
         setLoading(true);
         try {
-          const [userResponse, transactionsResponse] = await Promise.all([
+          const [userResponse] = await Promise.all([
             axios.get(`https://backend-bora.onrender.com/user/${userId}`, {
               withCredentials: true,
             }),
-            transactionId
-              ? axios.get(
-                  `https://backend-bora.onrender.com/transaction/${transactionId}`,
-                  { withCredentials: true }
-                )
-              : Promise.resolve({ data: { data: [] } }),
           ]);
 
-          setUser(userResponse.data.data);
-          if (transactionId) {
-            setTransactions([transactionsResponse.data.data]);
+          if (userResponse.data?.data) {
+            setUser(userResponse.data.data);
+            setTransactions(userResponse.data.data.transactionHistory || []);
+          } else {
+            throw new Error("User data not found");
           }
         } catch (error) {
           console.error("Error:", error);
@@ -78,7 +74,7 @@ export default function Dashboard() {
 
       fetchData();
     }
-  }, [userId, transactionId, navigate]);
+  }, [userId, navigate]);
 
   const handleShowModal = (modal) => {
     switch (modal) {
@@ -150,22 +146,32 @@ export default function Dashboard() {
     e.preventDefault();
     const { amount } = depositData;
 
-    if (!amount || amount <= 0) {
-      toast.error("Please enter a valid amount.");
+    if (!amount) {
+      toast.error("Amount is required");
       return;
     }
 
     try {
       await axios.post(
-        "https://backend-bora.onrender.com/deposit", // Ensure this endpoint is correct
-        depositData,
+        "https://backend-bora.onrender.com/transaction/deposit",
+        { amount },
         { withCredentials: true }
       );
       toast.success("Deposit successful");
+      setDepositData({ amount: "" });
       handleCloseModal("deposit");
+
+      // Refresh user data
+      const userResponse = await axios.get(
+        `https://backend-bora.onrender.com/user/${userId}`,
+        { withCredentials: true }
+      );
+      setUser(userResponse.data.data);
     } catch (error) {
-      console.error("Error depositing:", error);
-      toast.error("Failed to deposit");
+      console.error("Error:", error);
+      toast.error(
+        error.response?.data?.message || "An unexpected error occurred"
+      );
     }
   };
 
@@ -292,10 +298,33 @@ export default function Dashboard() {
               </div>
               <div className="transactions-section">
                 {transactions.length > 0 ? (
-                  <ul>
+                  <ul className="list-group">
                     {transactions.map((transaction) => (
-                      <li key={transaction._id}>
-                        {new Date(transaction.createdAt).toLocaleDateString()} -
+                      <li key={transaction._id} className="list-group-item">
+                        <p>
+                          <strong>Sender:</strong> {transaction.senderName}
+                        </p>
+                        <p>
+                          <strong>Receiver:</strong> {transaction.receiverName}
+                        </p>
+                        <p>
+                          <strong>Amount:</strong> ${transaction.amount}
+                        </p>
+                        <p>
+                          <strong>Fee Rate:</strong> {transaction.fee_rate}%
+                        </p>
+                        <p>
+                          <strong>Initial Sender Balance:</strong> $
+                          {transaction.initialSenderBalance}
+                        </p>
+                        <p>
+                          <strong>Final Sender Balance:</strong> $
+                          {transaction.finalSenderBalance}
+                        </p>
+                        <p>
+                          <strong>Date:</strong>{" "}
+                          {new Date(transaction.createdAt).toLocaleDateString()}
+                        </p>
                       </li>
                     ))}
                   </ul>
@@ -305,8 +334,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-
-          {/* Modals */}
+          {/* Modals Send */}
           <Modal show={showSendModal} onHide={() => handleCloseModal("send")}>
             <Modal.Header closeButton>
               <Modal.Title className="text-black">
@@ -366,7 +394,7 @@ export default function Dashboard() {
               </Form>
             </Modal.Body>
           </Modal>
-
+          {/* Modals Deposit */}
           <Modal
             show={showDepositModal}
             onHide={() => handleCloseModal("deposit")}
@@ -383,10 +411,11 @@ export default function Dashboard() {
                   <Form.Label className="text-black">Amount</Form.Label>
                   <Form.Control
                     type="number"
-                    placeholder="Enter amount"
                     name="amount"
                     value={depositData.amount}
                     onChange={(e) => handleInputChange(e, setDepositData)}
+                    placeholder="Deposit amount"
+                    required
                   />
                 </Form.Group>
                 <Button variant="primary" type="submit">
@@ -395,7 +424,7 @@ export default function Dashboard() {
               </Form>
             </Modal.Body>
           </Modal>
-
+          {/* Modals Transfer */}
           <Modal
             show={showTransferModal}
             onHide={() => handleCloseModal("transfer")}

@@ -107,6 +107,7 @@ export default function Login() {
               value={data.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}
               className={`form-control ${errors.email ? "is-invalid" : ""}`}
+              autoComplete="current-email"
             />
             {errors.email && <p className="error">{errors.email}</p>}
           </div>
@@ -123,6 +124,7 @@ export default function Login() {
               value={data.password}
               onChange={(e) => setData({ ...data, password: e.target.value })}
               className={`form-control ${errors.password ? "is-invalid" : ""}`}
+              autoComplete="current-password"
             />
             {errors.password && <p className="error">{errors.password}</p>}
           </div>
