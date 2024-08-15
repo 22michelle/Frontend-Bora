@@ -36,10 +36,11 @@ export default function Dashboard() {
 
   const [depositData, setDepositData] = useState({
     amount: "",
+    accountNumber: "",
   });
 
-  const [transferData, setTransferData] = useState({
-    receiverAccountNumber: "",
+  const [withdrawData, setWithdrawData] = useState({
+    accountNumber: "",
     amount: "",
   });
 
@@ -100,7 +101,7 @@ export default function Dashboard() {
       case "deposit":
         setShowDepositModal(false);
         break;
-      case "transfer":
+      case "withdraw":
         setShowTransferModal(false);
         break;
       default:
@@ -113,6 +114,7 @@ export default function Dashboard() {
     stateSetter((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Transaction
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { senderAccountNumber, receiverAccountNumber, amount, feeRate } =
@@ -123,15 +125,15 @@ export default function Dashboard() {
       return;
     }
 
-    if (amount <= 0) {
-      toast.error("Amount must be greater than zero.");
-      return;
-    }
-
     try {
-      await axios.post(
+      const response = await axios.post(
         "https://backend-bora.onrender.com/transaction/transaction",
-        formData,
+        {
+          senderAccountNumber,
+          receiverAccountNumber,
+          amount: Number(amount),
+          feeRate: Number(feeRate),
+        },
         { withCredentials: true }
       );
       toast.success("Transaction created successfully");
@@ -142,23 +144,24 @@ export default function Dashboard() {
     }
   };
 
+  // Deposit
   const handleDeposit = async (e) => {
     e.preventDefault();
-    const { amount } = depositData;
+    const { amount, accountNumber } = depositData;
 
-    if (!amount) {
-      toast.error("Amount is required");
+    if (!amount || !accountNumber) {
+      toast.error("Account number and amount are required");
       return;
     }
 
     try {
       await axios.post(
         "https://backend-bora.onrender.com/transaction/deposit",
-        { amount },
+        { amount, accountNumber },
         { withCredentials: true }
       );
       toast.success("Deposit successful");
-      setDepositData({ amount: "" });
+      setDepositData({ amount: "", accountNumber: "" });
       handleCloseModal("deposit");
 
       // Refresh user data
@@ -175,11 +178,12 @@ export default function Dashboard() {
     }
   };
 
-  const handleTransfer = async (e) => {
+  // Withdraw
+  const handleWithdraw = async (e) => {
     e.preventDefault();
-    const { receiverAccountNumber, amount } = transferData;
+    const { accountNumber, amount } = withdrawData;
 
-    if (!receiverAccountNumber || !amount || amount <= 0) {
+    if (!accountNumber || !amount || amount <= 0) {
       toast.error("Please fill out all fields with valid values.");
       return;
     }
@@ -191,15 +195,25 @@ export default function Dashboard() {
 
     try {
       await axios.post(
-        "https://backend-bora.onrender.com/transaction/transaction",
-        transferData,
+        "https://backend-bora.onrender.com/transaction/withdraw",
+        { amount, accountNumber },
         { withCredentials: true }
       );
-      toast.success("Transfer successful");
-      handleCloseModal("transfer");
+      toast.success("Withdrawal successful");
+      setWithdrawData({ accountNumber: "", amount: "" });
+      handleCloseModal("withdraw");
+
+      // Refresh user data
+      const userResponse = await axios.get(
+        `https://backend-bora.onrender.com/user/${userId}`,
+        { withCredentials: true }
+      );
+      setUser(userResponse.data.data);
     } catch (error) {
-      console.error("Error transferring:", error);
-      toast.error("Failed to transfer");
+      console.error("Error withdraw:", error);
+      toast.error(
+        error.response?.data?.message || "An unexpected error occurred"
+      );
     }
   };
 
@@ -215,6 +229,7 @@ export default function Dashboard() {
         </div>
       ) : user ? (
         <div className="dashboard-content">
+          {/* User Info */}
           <div className="dashboard-card">
             <h1>
               Welcome, {user.name}!
@@ -273,7 +288,7 @@ export default function Dashboard() {
                             className="me-2"
                           />
                           <br />
-                          Transfer
+                          WithDraw
                         </Button>
                       </div>
                     </div>
@@ -297,40 +312,18 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="transactions-section">
-                {transactions.length > 0 ? (
-                  <ul className="list-group">
-                    {transactions.map((transaction) => (
-                      <li key={transaction._id} className="list-group-item">
-                        <p>
-                          <strong>Sender:</strong> {transaction.senderName}
-                        </p>
-                        <p>
-                          <strong>Receiver:</strong> {transaction.receiverName}
-                        </p>
-                        <p>
-                          <strong>Amount:</strong> ${transaction.amount}
-                        </p>
-                        <p>
-                          <strong>Fee Rate:</strong> {transaction.fee_rate}%
-                        </p>
-                        <p>
-                          <strong>Initial Sender Balance:</strong> $
-                          {transaction.initialSenderBalance}
-                        </p>
-                        <p>
-                          <strong>Final Sender Balance:</strong> $
-                          {transaction.finalSenderBalance}
-                        </p>
-                        <p>
-                          <strong>Date:</strong>{" "}
-                          {new Date(transaction.createdAt).toLocaleDateString()}
-                        </p>
+                <ul>
+                  {user.transactionHistory &&
+                  user.transactionHistory.length > 0 ? (
+                    user.transactionHistory.map((transaction) => (
+                      <li key={transaction._id}>
+                          ${transaction.amount}
                       </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No transactions available.</p>
-                )}
+                    ))
+                  ) : (
+                    <p>No transactions found.</p>
+                  )}
+                </ul>
               </div>
             </div>
           </div>
@@ -394,6 +387,7 @@ export default function Dashboard() {
               </Form>
             </Modal.Body>
           </Modal>
+
           {/* Modals Deposit */}
           <Modal
             show={showDepositModal}
@@ -407,6 +401,17 @@ export default function Dashboard() {
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={handleDeposit}>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-black">Account Number</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="accountNumber"
+                    value={depositData.accountNumber}
+                    onChange={(e) => handleInputChange(e, setDepositData)}
+                    placeholder="Account number"
+                    required
+                  />
+                </Form.Group>{" "}
                 <Form.Group className="mb-3">
                   <Form.Label className="text-black">Amount</Form.Label>
                   <Form.Control
@@ -424,43 +429,36 @@ export default function Dashboard() {
               </Form>
             </Modal.Body>
           </Modal>
-          {/* Modals Transfer */}
-          <Modal
-            show={showTransferModal}
-            onHide={() => handleCloseModal("transfer")}
-          >
+
+        {/* Withdraw Modal */}
+        <Modal show={showTransferModal} onHide={() => handleCloseModal("withdraw")}>
             <Modal.Header closeButton>
-              <Modal.Title className="text-black">
-                <FontAwesomeIcon icon={faArrowDown} className="me-2" />
-                Transfer
-              </Modal.Title>
+              <Modal.Title className="text-black">Withdraw Funds</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <Form onSubmit={handleTransfer}>
-                <Form.Group className="mb-3">
-                  <Form.Label className="text-black">
-                    Receiver Account Number
-                  </Form.Label>
+              <Form onSubmit={handleWithdraw}>
+                <Form.Group controlId="accountNumber">
+                  <Form.Label className="text-black">Account Number</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Enter receiver account number"
-                    name="receiverAccountNumber"
-                    value={transferData.receiverAccountNumber}
-                    onChange={(e) => handleInputChange(e, setTransferData)}
+                    name="accountNumber"
+                    value={withdrawData.accountNumber}
+                    onChange={(e) => handleInputChange(e, setWithdrawData)}
+                    required
                   />
                 </Form.Group>
-                <Form.Group className="mb-3">
+                <Form.Group controlId="amount">
                   <Form.Label className="text-black">Amount</Form.Label>
                   <Form.Control
                     type="number"
-                    placeholder="Enter amount"
                     name="amount"
-                    value={transferData.amount}
-                    onChange={(e) => handleInputChange(e, setTransferData)}
+                    value={withdrawData.amount}
+                    onChange={(e) => handleInputChange(e, setWithdrawData)}
+                    required
                   />
                 </Form.Group>
-                <Button variant="primary" type="submit">
-                  Transfer
+                <Button variant="primary" type="submit" className="mt-3">
+                  Withdraw
                 </Button>
               </Form>
             </Modal.Body>
