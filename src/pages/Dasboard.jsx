@@ -138,6 +138,14 @@ export default function Dashboard() {
       );
       toast.success("Transaction created successfully");
       handleCloseModal("send");
+
+      // Refresh user data
+      const userResponse = await axios.get(
+        `https://backend-bora.onrender.com/user/${userId}`,
+        { withCredentials: true }
+      );
+
+      setUser(userResponse.data.data);
     } catch (error) {
       console.error("Error creating transaction:", error);
       toast.error("Failed to create transaction");
@@ -169,6 +177,9 @@ export default function Dashboard() {
         `https://backend-bora.onrender.com/user/${userId}`,
         { withCredentials: true }
       );
+
+      console.log("Updated user data:", userResponse.data.data);
+
       setUser(userResponse.data.data);
     } catch (error) {
       console.error("Error:", error);
@@ -208,6 +219,7 @@ export default function Dashboard() {
         `https://backend-bora.onrender.com/user/${userId}`,
         { withCredentials: true }
       );
+
       setUser(userResponse.data.data);
     } catch (error) {
       console.error("Error withdraw:", error);
@@ -316,9 +328,7 @@ export default function Dashboard() {
                   {user.transactionHistory &&
                   user.transactionHistory.length > 0 ? (
                     user.transactionHistory.map((transaction) => (
-                      <li key={transaction._id}>
-                          ${transaction.amount}
-                      </li>
+                      <li key={transaction._id}>${transaction.amount}</li>
                     ))
                   ) : (
                     <p>No transactions found.</p>
@@ -430,8 +440,11 @@ export default function Dashboard() {
             </Modal.Body>
           </Modal>
 
-        {/* Withdraw Modal */}
-        <Modal show={showTransferModal} onHide={() => handleCloseModal("withdraw")}>
+          {/* Withdraw Modal */}
+          <Modal
+            show={showTransferModal}
+            onHide={() => handleCloseModal("withdraw")}
+          >
             <Modal.Header closeButton>
               <Modal.Title className="text-black">Withdraw Funds</Modal.Title>
             </Modal.Header>
