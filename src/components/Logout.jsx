@@ -5,6 +5,8 @@ import { logout } from "../redux/actions/authActions,js";
 import "../App.css";
 import { Button } from "react-bootstrap";
 import logo from "../../src/assets/logo2.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 export default function HeaderLogout() {
   const { token } = useSelector((state) => state.auth);
@@ -39,7 +41,7 @@ export default function HeaderLogout() {
           <ul className="navbar-nav">
             <li className="nav-item">
               <Button className="nav-link text-white mb-2" onClick={handleLogout}>
-                Logout
+             Logout <FontAwesomeIcon icon={faRightFromBracket} />  
               </Button>
             </li>
           </ul>

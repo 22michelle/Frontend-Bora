@@ -114,14 +114,18 @@ export default function Dashboard() {
     stateSetter((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Transaction
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     const { senderAccountNumber, receiverAccountNumber, amount, feeRate } =
       formData;
 
     if (!senderAccountNumber || !receiverAccountNumber || !amount || !feeRate) {
       toast.error("Please fill out all fields.");
+      setIsSubmitting(false);
       return;
     }
 
@@ -139,7 +143,7 @@ export default function Dashboard() {
       toast.success("Transaction created successfully");
       handleCloseModal("send");
 
-      // Refresh user data
+      // Actualizar datos del usuario
       const userResponse = await axios.get(
         `https://backend-bora.onrender.com/user/${userId}`,
         { withCredentials: true }
@@ -149,12 +153,16 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Error creating transaction:", error);
       toast.error("Failed to create transaction");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // Deposit
   const handleDeposit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     const { amount, accountNumber } = depositData;
 
     if (!amount || !accountNumber) {
@@ -192,6 +200,8 @@ export default function Dashboard() {
   // Withdraw
   const handleWithdraw = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     const { accountNumber, amount } = withdrawData;
 
     if (!accountNumber || !amount || amount <= 0) {
@@ -391,8 +401,8 @@ export default function Dashboard() {
                     onChange={(e) => handleInputChange(e, setFormData)}
                   />
                 </Form.Group>
-                <Button variant="primary" type="submit">
-                  Send
+                <Button variant="primary" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Processing..." : "Send"}
                 </Button>
               </Form>
             </Modal.Body>
@@ -433,8 +443,8 @@ export default function Dashboard() {
                     required
                   />
                 </Form.Group>
-                <Button variant="primary" type="submit">
-                  Deposit
+                <Button variant="primary" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Processing..." : "Deposit"}
                 </Button>
               </Form>
             </Modal.Body>
@@ -460,7 +470,7 @@ export default function Dashboard() {
                     required
                   />
                 </Form.Group>
-                <Form.Group controlId="amount">
+                <Form.Group controlId="amount" className="mb-3">
                   <Form.Label className="text-black">Amount</Form.Label>
                   <Form.Control
                     type="number"
@@ -470,8 +480,8 @@ export default function Dashboard() {
                     required
                   />
                 </Form.Group>
-                <Button variant="primary" type="submit" className="mt-3">
-                  Withdraw
+                <Button variant="primary" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Processing..." : "Withdraw"}
                 </Button>
               </Form>
             </Modal.Body>
