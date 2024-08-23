@@ -26,7 +26,6 @@ export default function Dashboard() {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [formData, setFormData] = useState({
-    // senderAccountNumber: "",
     receiverAccountNumber: "",
     amount: "",
     feeRate: "",

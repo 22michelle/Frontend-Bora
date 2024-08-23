@@ -13,7 +13,8 @@ export default function HeaderLogout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleLogout = () => {
+  const handleLogout = (e) => {
+    e.preventDefault();
     dispatch(logout());
     localStorage.removeItem("userId");
     navigate("/login");
@@ -22,7 +23,7 @@ export default function HeaderLogout() {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="">
+        <Link className="navbar-brand" to="/">
           <img src={logo} alt="Bora" className="navbar-logo-img" />
           <h2 className="mt-2">Bora</h2>
         </Link>
@@ -40,8 +41,8 @@ export default function HeaderLogout() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link className="nav-link  text-center" onClick={handleLogout}>
-             Logout <FontAwesomeIcon icon={faRightFromBracket} />  
+              <Link className="nav-link text-center" to="/login" onClick={handleLogout}>
+                Logout <FontAwesomeIcon icon={faRightFromBracket} />
               </Link>
             </li>
           </ul>
