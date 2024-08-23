@@ -17,7 +17,8 @@ export default function Home() {
         <Link to="/register">
           <button className="btn explore mt-4">Explore Bora</button>
         </Link>
-      </Row>
+      </Row> 
     </Container>
+ 
   );
 }

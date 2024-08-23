@@ -7,7 +7,6 @@ import Register from "../src/pages/Register.jsx";
 import Dashboard from "./pages/Dasboard.jsx";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
-import Footer from "./components/Footer.jsx";
 
 axios.defaults.baseURL = "http://localhost:4000";
 axios.defaults.withCredentials = true;
@@ -33,7 +32,6 @@ function App() {
     <>
       {/* Conditionally render Header */}
       {location.pathname !== "/dashboard" && <Header />}
-      {location.pathname !== "/dashboard" && <Footer />}
       <Toaster position="bottom-right" toastOptions={{ duration: 4000 }} />
       <Routes>
         <Route path="/" element={<Home />} />
