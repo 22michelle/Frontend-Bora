@@ -37,7 +37,7 @@ export default function Header() {
             <li className="nav-item">
               <Link
                 to="/"
-                className="nav-link text-center mx-auto text-decoration-none text-white"
+                className="nav-link text-center mx-auto text-decoration-none"
                 onClick={closeToggler}
               >
                 Home
@@ -46,7 +46,7 @@ export default function Header() {
             <li className="nav-item">
               <Link
                 to="/register"
-                className="nav-link text-center mx-auto text-decoration-none text-white"
+                className="nav-link text-center mx-auto text-decoration-none"
                 onClick={closeToggler}
               >
                 Register
@@ -55,7 +55,7 @@ export default function Header() {
             <li className="nav-item">
               <Link
                 to="/login"
-                className="nav-link text-center mx-auto text-decoration-none text-white mb-2"
+                className="nav-link text-center mx-auto text-decoration-none"
                 onClick={closeToggler}
               >
                 Login
@@ -64,6 +64,7 @@ export default function Header() {
           </ul>
         </div>
       </div>
+      <hr />
     </nav>
   );
 }

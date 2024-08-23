@@ -202,22 +202,44 @@ h1 {
   width: auto;
 }
 
-/* Enlaces del Navbar */
+/* Link Navbar */
+.navbar-nav {
+  margin-left: auto;
+  gap: 5px;
+  color: #000;
+  position: relative;
+  padding-bottom: 5px;
+  transition: all 0.3s ease;
+}
+.nav-link {
+  color: #000;
+  position: relative;
+  padding-bottom: 5px;
+  transition: all 0.3s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background-color: #000;
+  transition: width 0.6m ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
 .navbar-nav {
   margin-left: auto;
   gap: 5px;
 }
-.nav-link {
-  background-color: #000;
-  color: #ffffff;
-  padding: 0.7rem;
-  border-radius: 5px;
-  min-width: 25%;
-}
 
-.nav-link:hover {
-  background-color: #000000d3;
-  color: white;
-  padding: 0.7rem;
-  border-radius: 5px;
+.fw-bold {
+  font-weight: bold;
+  font-size: 20px;
 }

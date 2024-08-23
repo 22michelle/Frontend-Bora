@@ -5,6 +5,32 @@ body {
   padding: 0;
 }
 
+body {
+  --sb-track-color: #000000;
+  --sb-thumb-color: #ffffffee;
+  --sb-size: 10px;
+}
+
+body::-webkit-scrollbar {
+  width: var(--sb-size);
+}
+
+body::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 9px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 9px;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  body {
+    scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+  }
+}
+
 /* Dashboard */
 .dashboard-container {
   padding: 20px;
