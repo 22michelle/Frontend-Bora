@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHands,
   faWallet,
-  faFileInvoiceDollar,
   faArrowUp,
   faArrowDown,
   faMoneyBill,
@@ -20,7 +19,6 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userId = useSelector((state) => state.auth.userId);
-  const transactionId = useSelector((state) => state.auth.transactionId);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [transactions, setTransactions] = useState([]);
@@ -28,7 +26,7 @@ export default function Dashboard() {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [formData, setFormData] = useState({
-    senderAccountNumber: "",
+    // senderAccountNumber: "",
     receiverAccountNumber: "",
     amount: "",
     feeRate: "",
@@ -51,11 +49,10 @@ export default function Dashboard() {
       const fetchData = async () => {
         setLoading(true);
         try {
-          const [userResponse] = await Promise.all([
-            axios.get(`https://backend-bora.onrender.com/user/${userId}`, {
-              withCredentials: true,
-            }),
-          ]);
+          const userResponse = await axios.get(
+            `https://backend-bora.onrender.com/user/${userId}`,
+            { withCredentials: true }
+          );
 
           if (userResponse.data?.data) {
             setUser(userResponse.data.data);
@@ -116,20 +113,22 @@ export default function Dashboard() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Send
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const { senderAccountNumber, receiverAccountNumber, amount, feeRate } =
-      formData;
+    const { receiverAccountNumber, amount, feeRate } = formData;
 
-    if (!senderAccountNumber || !receiverAccountNumber || !amount || !feeRate) {
+    if (!receiverAccountNumber || !amount || !feeRate) {
       toast.error("Please fill out all fields.");
       setIsSubmitting(false);
       return;
     }
 
     try {
+      const senderAccountNumber = user.accountNumber;
+
       const response = await axios.post(
         "https://backend-bora.onrender.com/transaction/transaction",
         {
@@ -140,10 +139,10 @@ export default function Dashboard() {
         },
         { withCredentials: true }
       );
+
       toast.success("Transaction created successfully");
       handleCloseModal("send");
 
-      // Actualizar datos del usuario
       const userResponse = await axios.get(
         `https://backend-bora.onrender.com/user/${userId}`,
         { withCredentials: true }
@@ -163,10 +162,12 @@ export default function Dashboard() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const { amount, accountNumber } = depositData;
+    const { amount } = depositData;
+    const accountNumber = user.accountNumber;
 
-    if (!amount || !accountNumber) {
-      toast.error("Account number and amount are required");
+    if (!amount) {
+      toast.error("The amount is required");
+      setIsSubmitting(false);
       return;
     }
 
@@ -177,7 +178,7 @@ export default function Dashboard() {
         { withCredentials: true }
       );
       toast.success("Deposit successful");
-      setDepositData({ amount: "", accountNumber: "" });
+      setDepositData({ amount: "" });
       handleCloseModal("deposit");
 
       // Refresh user data
@@ -194,23 +195,31 @@ export default function Dashboard() {
       toast.error(
         error.response?.data?.message || "An unexpected error occurred"
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // Withdraw
   const handleWithdraw = async (e) => {
     e.preventDefault();
+    console.log("Submit triggered");
     setIsSubmitting(true);
 
-    const { accountNumber, amount } = withdrawData;
+    const { amount } = withdrawData;
+    const accountNumber = user.accountNumber;
 
-    if (!accountNumber || !amount || amount <= 0) {
-      toast.error("Please fill out all fields with valid values.");
+    console.log("Withdraw data:", withdrawData);
+
+    if (!amount || amount <= 0) {
+      toast.error("The amount is required");
+      setIsSubmitting(false);
       return;
     }
 
     if (!user || amount > user.balance) {
       toast.error("Insufficient balance");
+      setIsSubmitting(false);
       return;
     }
 
@@ -236,6 +245,9 @@ export default function Dashboard() {
       toast.error(
         error.response?.data?.message || "An unexpected error occurred"
       );
+    } finally {
+      console.log("Resetting submitting state");
+      setIsSubmitting(false);
     }
   };
 
@@ -359,18 +371,6 @@ export default function Dashboard() {
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                   <Form.Label className="text-black">
-                    Sender Account Number
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter sender account number"
-                    name="senderAccountNumber"
-                    value={formData.senderAccountNumber}
-                    onChange={(e) => handleInputChange(e, setFormData)}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label className="text-black">
                     Receiver Account Number
                   </Form.Label>
                   <Form.Control
@@ -401,8 +401,20 @@ export default function Dashboard() {
                     onChange={(e) => handleInputChange(e, setFormData)}
                   />
                 </Form.Group>
-                <Button variant="primary" type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Processing..." : "Send"}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                    </>
+                  ) : (
+                    "Send"
+                  )}
                 </Button>
               </Form>
             </Modal.Body>
@@ -422,17 +434,6 @@ export default function Dashboard() {
             <Modal.Body>
               <Form onSubmit={handleDeposit}>
                 <Form.Group className="mb-3">
-                  <Form.Label className="text-black">Account Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="accountNumber"
-                    value={depositData.accountNumber}
-                    onChange={(e) => handleInputChange(e, setDepositData)}
-                    placeholder="Account number"
-                    required
-                  />
-                </Form.Group>{" "}
-                <Form.Group className="mb-3">
                   <Form.Label className="text-black">Amount</Form.Label>
                   <Form.Control
                     type="number"
@@ -443,8 +444,20 @@ export default function Dashboard() {
                     required
                   />
                 </Form.Group>
-                <Button variant="primary" type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Processing..." : "Deposit"}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                    </>
+                  ) : (
+                    "Deposit"
+                  )}
                 </Button>
               </Form>
             </Modal.Body>
@@ -456,20 +469,13 @@ export default function Dashboard() {
             onHide={() => handleCloseModal("withdraw")}
           >
             <Modal.Header closeButton>
-              <Modal.Title className="text-black">Withdraw Funds</Modal.Title>
+              <Modal.Title className="text-black">
+                <FontAwesomeIcon icon={faArrowDown} className="me-2" /> Withdraw
+                Funds
+              </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={handleWithdraw}>
-                <Form.Group controlId="accountNumber">
-                  <Form.Label className="text-black">Account Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="accountNumber"
-                    value={withdrawData.accountNumber}
-                    onChange={(e) => handleInputChange(e, setWithdrawData)}
-                    required
-                  />
-                </Form.Group>
                 <Form.Group controlId="amount" className="mb-3">
                   <Form.Label className="text-black">Amount</Form.Label>
                   <Form.Control
@@ -477,11 +483,24 @@ export default function Dashboard() {
                     name="amount"
                     value={withdrawData.amount}
                     onChange={(e) => handleInputChange(e, setWithdrawData)}
+                    placeholder="Enter the amount to withdraw"
                     required
                   />
                 </Form.Group>
-                <Button variant="primary" type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Processing..." : "Withdraw"}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                    </>
+                  ) : (
+                    "Withdraw"
+                  )}
                 </Button>
               </Form>
             </Modal.Body>
