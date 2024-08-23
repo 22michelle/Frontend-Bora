@@ -40,7 +40,7 @@ export default function HeaderLogout() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link className="nav-link" onClick={handleLogout}>
+              <Link className="nav-link  text-center" onClick={handleLogout}>
              Logout <FontAwesomeIcon icon={faRightFromBracket} />  
               </Link>
             </li>
