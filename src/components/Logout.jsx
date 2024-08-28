@@ -3,8 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/actions/authActions,js";
 import "../App.css";
-import { Button } from "react-bootstrap";
-import logo from "../../src/assets/logo.png";
+import logo from "../../src/assets/logo1.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 

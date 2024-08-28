@@ -1,17 +1,10 @@
 import React, { useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Alert,
-  Card,
-} from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import emailjs from "emailjs-com";
 import toast, { Toaster } from "react-hot-toast";
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import logo from "../assets/contact.jpg";
 
 const SupportForm = () => {
   const [formData, setFormData] = useState({
@@ -108,10 +101,10 @@ const SupportForm = () => {
         {/* Img */}
         <Col xs={12} md={6} className="d-flex flex-column align-items-center">
           <img
-            src="../../src/assets/contact.jpg"
+            src={logo}
             alt="Support"
             style={{
-              width: "80%",
+              width: "100%",
               height: "auto",
               borderRadius: "3px",
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
@@ -119,7 +112,6 @@ const SupportForm = () => {
           />
           <div
             style={{
-              marginTop: "-155px",
               marginBottom: "40px",
               padding: "1.5rem",
               backgroundColor: "rgba(0, 0, 0, 0.7)",
@@ -127,7 +119,7 @@ const SupportForm = () => {
                 "linear-gradient(90deg, rgba(242,224,213,1) 50%, rgba(194,202,228,1) 100%)",
               color: "black",
               textAlign: "center",
-              width: "80%",
+              width: "100%",
               height: "auto",
               borderRadius: "3px",
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
