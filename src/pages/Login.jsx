@@ -14,6 +14,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Spinner, Container, Row, Col, Card } from "react-bootstrap";
 import Footer from "../components/Footer";
+import logo from "../../src/assets/logo1.png";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ export default function Login() {
                 }}
               >
                 <img
-                  src="../../src/assets/logo.png"
+                  src={logo}
                   alt="Logo"
                   style={{
                     width: "50px",

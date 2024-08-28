@@ -8,6 +8,7 @@ import {
   faLinkedinIn,
   faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
+import logo from "../../src/assets/Logo2.png";
 
 const Footer = () => {
   return (
@@ -18,15 +19,14 @@ const Footer = () => {
             <a
               href="#Home"
               data-event="logo | footer-logo"
-              className="d-flex align-items-center p-3 justify-content-start text-decoration-none text-white fw-bold fs-2"
+              className="d-flex align-items-center p-3 justify-content-start fs-2"
             >
               <img
-                src="../../src/assets/Logo3.png"
+                src={logo}
                 alt="Logo"
                 className="img-fluid"
                 style={{ maxHeight: "50px" }}
               />
-              Bora
             </a>
           </div>
         </Col>
@@ -46,13 +46,13 @@ const Footer = () => {
             <FontAwesomeIcon icon={faTwitter} />
           </a>
           <a href="#" className="text-white text-decoration-none mx-2">
-            <FontAwesomeIcon icon={faInstagram} /> 
+            <FontAwesomeIcon icon={faInstagram} />
           </a>
           <a href="#" className="text-white text-decoration-none mx-2">
-            <FontAwesomeIcon icon={faLinkedinIn} /> 
+            <FontAwesomeIcon icon={faLinkedinIn} />
           </a>
           <a href="#" className="text-white text-decoration-none mx-2">
-            <FontAwesomeIcon icon={faYoutube} /> 
+            <FontAwesomeIcon icon={faYoutube} />
           </a>
         </Col>
       </Row>
