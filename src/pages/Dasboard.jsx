@@ -14,14 +14,28 @@ import {
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faWallet,
   faArrowUp,
   faArrowDown,
-  faMoneyBill,
   faAngleRight,
+  faMoneyBill,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import HeaderLogout from "../components/Logout.jsx";
+import logo from "../../src/assets/logo1.png";
+
+// Define formatNumber function
+const formatNumber = (value) => {
+  if (value !== undefined && value !== null) {
+    const numberValue = parseFloat(value);
+    if (isNaN(numberValue)) {
+      return value; // return as is if not a number
+    }
+    return numberValue % 1 === 0
+      ? numberValue.toString()
+      : numberValue.toFixed(2);
+  }
+  return "N/A"; // handle cases where value is undefined or null
+};
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -62,8 +76,14 @@ export default function Dashboard() {
           );
 
           if (userResponse.data?.data) {
-            setUser(userResponse.data.data);
-            setTransactions(userResponse.data.data.transactionHistory || []);
+            const userData = userResponse.data.data;
+            setUser({
+              ...userData,
+              balance: formatNumber(userData.balance),
+              public_rate: formatNumber(userData.public_rate),
+              value: formatNumber(userData.value),
+            });
+            setTransactions(userData.transactionHistory || []);
           } else {
             throw new Error("User data not found");
           }
@@ -105,7 +125,7 @@ export default function Dashboard() {
       case "deposit":
         setShowDepositModal(false);
         break;
-      case "withdraw":
+      case "transfer":
         setShowTransferModal(false);
         break;
       default:
@@ -155,7 +175,12 @@ export default function Dashboard() {
         { withCredentials: true }
       );
 
-      setUser(userResponse.data.data);
+      setUser({
+        ...userResponse.data.data,
+        balance: formatNumber(userResponse.data.data.balance),
+        public_rate: formatNumber(userResponse.data.data.public_rate),
+        value: formatNumber(userResponse.data.data.value),
+      });
     } catch (error) {
       console.error("Error creating transaction:", error);
       toast.error("Failed to create transaction");
@@ -194,9 +219,12 @@ export default function Dashboard() {
         { withCredentials: true }
       );
 
-      console.log("Updated user data:", userResponse.data.data);
-
-      setUser(userResponse.data.data);
+      setUser({
+        ...userResponse.data.data,
+        balance: formatNumber(userResponse.data.data.balance),
+        public_rate: formatNumber(userResponse.data.data.public_rate),
+        value: formatNumber(userResponse.data.data.value),
+      });
     } catch (error) {
       console.error("Error:", error);
       toast.error(
@@ -210,13 +238,10 @@ export default function Dashboard() {
   // Withdraw
   const handleWithdraw = async (e) => {
     e.preventDefault();
-    console.log("Submit triggered");
     setIsSubmitting(true);
 
     const { amount } = withdrawData;
     const accountNumber = user.accountNumber;
-
-    console.log("Withdraw data:", withdrawData);
 
     if (!amount || amount <= 0) {
       toast.error("The amount is required");
@@ -246,14 +271,18 @@ export default function Dashboard() {
         { withCredentials: true }
       );
 
-      setUser(userResponse.data.data);
+      setUser({
+        ...userResponse.data.data,
+        balance: formatNumber(userResponse.data.data.balance),
+        public_rate: formatNumber(userResponse.data.data.public_rate),
+        value: formatNumber(userResponse.data.data.value),
+      });
     } catch (error) {
       console.error("Error withdraw:", error);
       toast.error(
         error.response?.data?.message || "An unexpected error occurred"
       );
     } finally {
-      console.log("Resetting submitting state");
       setIsSubmitting(false);
     }
   };
@@ -273,12 +302,12 @@ export default function Dashboard() {
           {/* Welcome */}
           <Col xs={12} md={12} className="mb-2">
             <Card className="p-3">
-              <Card-Body>
+              <Card.Body>
                 <Card.Title>
                   Hola, {user.name}
                   <FontAwesomeIcon icon={faAngleRight} />
                 </Card.Title>
-              </Card-Body>
+              </Card.Body>
             </Card>
           </Col>
 
@@ -296,18 +325,18 @@ export default function Dashboard() {
                         <Card.Title>{user.accountNumber}</Card.Title>
                       </Col>
                       <Col md={6} className="mt-3">
-                        Balance:
-                        <p className="fs-3">${parseFloat(user.balance).toFixed(2)}</p>
+                        <Card.Title>Balance:</Card.Title>
+                        <p className="fs-3">${formatNumber(user.balance)}</p>
                       </Col>
                     </Row>
                     <Row className="mb-3">
                       <Col md={6}>
-                        Public Rate:
-                        <p className="fs-3">{user.public_rate}</p>
+                        <Card.Title>PR:</Card.Title>
+                        <p className="fs-3">{formatNumber(user.public_rate)}</p>
                       </Col>
                       <Col md={6}>
-                        Value:
-                        <p className="fs-3">{user.value}</p>
+                        <Card.Title>Metabalance:</Card.Title>
+                        <p className="fs-3">{formatNumber(user.value)}</p>
                       </Col>
                     </Row>
                   </Card.Text>
@@ -335,28 +364,20 @@ export default function Dashboard() {
                             padding: "10px 20px",
                           }}
                         >
-                          <FontAwesomeIcon icon={faArrowUp} className="me-2" />
+                          <img
+                            src={logo}
+                            alt="logo"
+                            style={{
+                              width: "30px",
+                              height: "30px",
+                            }}
+                          />
                           Send
                         </Button>
                       </Col>
-                      <Col md={12} className="mt-3">
+                      <Col md={6} className="mt-3">
                         <Button
                           onClick={() => handleShowModal("deposit")}
-                          className="btn w-100"
-                          style={{
-                            backgroundColor: "#c2cae4",
-                            color: "black",
-                            border: "none",
-                            padding: "10px 20px",
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faWallet} className="me-2" />
-                          Deposit
-                        </Button>
-                      </Col>
-                      <Col md={12} className="mt-3">
-                        <Button
-                          onClick={() => handleShowModal("transfer")}
                           className="btn w-100"
                           style={{
                             backgroundColor: "#c2cae4",
@@ -369,6 +390,24 @@ export default function Dashboard() {
                             icon={faArrowDown}
                             className="me-2"
                           />
+                          Deposit
+                        </Button>
+                      </Col>
+                      <Col md={6} className="mt-3">
+                        <Button
+                          onClick={() => handleShowModal("transfer")}
+                          className="btn w-100"
+                          style={{
+                            backgroundColor: "#c2cae4",
+                            color: "black",
+                            border: "none",
+                            padding: "10px 20px",
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            icon={faArrowUp}
+                            className="me-2"
+                          />
                           Withdraw
                         </Button>
                       </Col>
@@ -379,178 +418,100 @@ export default function Dashboard() {
             </Col>
           </Row>
 
-          {/* Transaction History */}
-          {/* <Row className="mb-4">
-            <Col md={6}>
-              <p className="fw-bold">Transaction History</p>
-            </Col>
-            <Col md={6}>
-              <a
-                href="/transactionDetail"
-                className="fw-bold text-decoration-none text-black"
-              >
-                See More
-              </a>
-            </Col>
-          </Row>
-          <Card className="transactions-section">
-            <Card.Body>
-              <ul>
-                {user.transactionHistory &&
-                user.transactionHistory.length > 0 ? (
-                  user.transactionHistory.map((transaction) => (
-                    <li key={transaction._id}>${transaction.amount}</li>
-                  ))
-                ) : (
-                  <p>No transactions found.</p>
-                )}
-              </ul>
-            </Card.Body>
-          </Card> */}
-
           {/* Modals */}
+          {/* Send Modal */}
           <Modal show={showSendModal} onHide={() => handleCloseModal("send")}>
             <Modal.Header closeButton>
-              <Modal.Title className="text-black">
-                <FontAwesomeIcon icon={faArrowUp} className="me-2" />
-                Send
-              </Modal.Title>
+              <Modal.Title>Send Money</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
-                  <Form.Label className="text-black">
-                    Receiver Account Number
-                  </Form.Label>
+                  <Form.Label>Receiver's Account Number</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Enter receiver account number"
                     name="receiverAccountNumber"
                     value={formData.receiverAccountNumber}
                     onChange={(e) => handleInputChange(e, setFormData)}
+                    required
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                  <Form.Label className="text-black">Amount</Form.Label>
+                  <Form.Label>Amount</Form.Label>
                   <Form.Control
                     type="number"
-                    placeholder="Enter amount"
                     name="amount"
                     value={formData.amount}
                     onChange={(e) => handleInputChange(e, setFormData)}
+                    required
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                  <Form.Label className="text-black">Fee Rate</Form.Label>
+                  <Form.Label>Fee Rate</Form.Label>
                   <Form.Control
                     type="number"
-                    placeholder="Enter fee rate"
                     name="feeRate"
                     value={formData.feeRate}
                     onChange={(e) => handleInputChange(e, setFormData)}
+                    required
                   />
                 </Form.Group>
-                <Button type="submit" disabled={isSubmitting} className="w-100">
-                  {isSubmitting ? (
-                    <>
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                      />
-                      Processing...
-                    </>
-                  ) : (
-                    "Send"
-                  )}
+                <Button variant="primary" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Processing..." : "Send"}
                 </Button>
               </Form>
             </Modal.Body>
           </Modal>
 
+          {/* Deposit Modal */}
           <Modal
             show={showDepositModal}
             onHide={() => handleCloseModal("deposit")}
           >
             <Modal.Header closeButton>
-              <Modal.Title className="text-black">
-                <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
-                Deposit
-              </Modal.Title>
+              <Modal.Title>Deposit Money</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={handleDeposit}>
                 <Form.Group className="mb-3">
-                  <Form.Label className="text-black">Amount</Form.Label>
+                  <Form.Label>Amount</Form.Label>
                   <Form.Control
                     type="number"
                     name="amount"
                     value={depositData.amount}
                     onChange={(e) => handleInputChange(e, setDepositData)}
-                    placeholder="Deposit amount"
                     required
                   />
                 </Form.Group>
-                <Button type="submit" disabled={isSubmitting} className="w-100">
-                  {isSubmitting ? (
-                    <>
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                      />
-                      Processing...
-                    </>
-                  ) : (
-                    "Deposit"
-                  )}
+                <Button variant="primary" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Processing..." : "Deposit"}
                 </Button>
               </Form>
             </Modal.Body>
           </Modal>
 
+          {/* Withdraw Modal */}
           <Modal
             show={showTransferModal}
-            onHide={() => handleCloseModal("withdraw")}
+            onHide={() => handleCloseModal("transfer")}
           >
             <Modal.Header closeButton>
-              <Modal.Title className="text-black">
-                <FontAwesomeIcon icon={faArrowDown} className="me-2" /> Withdraw
-                Funds
-              </Modal.Title>
+              <Modal.Title>Withdraw Money</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={handleWithdraw}>
-                <Form.Group controlId="amount" className="mb-3">
-                  <Form.Label className="text-black">Amount</Form.Label>
+                <Form.Group className="mb-3">
+                  <Form.Label>Amount</Form.Label>
                   <Form.Control
                     type="number"
                     name="amount"
                     value={withdrawData.amount}
                     onChange={(e) => handleInputChange(e, setWithdrawData)}
-                    placeholder="Enter the amount to withdraw"
                     required
                   />
                 </Form.Group>
-                <Button type="submit" disabled={isSubmitting} className="w-100">
-                  {isSubmitting ? (
-                    <>
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                      />
-                      Processing...
-                    </>
-                  ) : (
-                    "Withdraw"
-                  )}
+                <Button variant="primary" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Processing..." : "Withdraw"}
                 </Button>
               </Form>
             </Modal.Body>
