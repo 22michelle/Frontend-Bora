@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/actions/authActions,js";
 import "../App.css";
 import { Button } from "react-bootstrap";
-import logo from "../../src/assets/logo2.png";
+import logo from "../../src/assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
@@ -39,9 +39,9 @@ export default function HeaderLogout() {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav">
+          <ul className="navbar-nav ms-auto">
             <li className="nav-item">
-              <Link className="nav-link text-center" to="/login" onClick={handleLogout}>
+              <Link className="nav-link text-center mx-auto me-2" to="/login" onClick={handleLogout}>
                 Logout <FontAwesomeIcon icon={faRightFromBracket} />
               </Link>
             </li>

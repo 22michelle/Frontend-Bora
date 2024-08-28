@@ -2,17 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Spinner, Button, Modal, Form } from "react-bootstrap";
+import {
+  Spinner,
+  Button,
+  Modal,
+  Form,
+  Container,
+  Row,
+  Col,
+  Card,
+} from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faHands,
   faWallet,
   faArrowUp,
   faArrowDown,
   faMoneyBill,
+  faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import "./styles.css";
 import HeaderLogout from "../components/Logout.jsx";
 
 export default function Dashboard() {
@@ -251,7 +259,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="dashboard-container">
+    <Container fluid className="px-5 py-5 mt-4">
       <HeaderLogout />
       {loading ? (
         <div className="overlay">
@@ -261,104 +269,146 @@ export default function Dashboard() {
           </div>
         </div>
       ) : user ? (
-        <div className="dashboard-content">
+        <>
+          {/* Welcome */}
+          <Col xs={12} md={12} className="mb-2">
+            <Card className="p-3">
+              <Card-Body>
+                <Card.Title>
+                  Hola, {user.name}
+                  <FontAwesomeIcon icon={faAngleRight} />
+                </Card.Title>
+              </Card-Body>
+            </Card>
+          </Col>
+
           {/* User Info */}
-          <div className="dashboard-card">
-            <h1>
-              Welcome, {user.name}!
-              <FontAwesomeIcon icon={faHands} className="ms-2" />
-            </h1>
-            <div className="balance-section">
-              <div className="row g-2">
-                <div className="p-3 border bg-light">
-                  Account Number:
-                  <p>{user.accountNumber}</p>
-                  Balance:
-                  <p className="fs-3">${user.balance}</p>
-                  <div className="row g-2">
-                    <div className="col-6">
-                      Public Rate:
-                      <p className="fs-3">{user.public_rate}</p>
-                    </div>
-                    <div className="col-6">
-                      Value: <p className="fs-3">{user.value}</p>
-                    </div>
-                  </div>
-                  {/* Menu Buttons */}
-                  <div className="mx-auto">
-                    <div
-                      className="row g-2"
-                      role="group"
-                      aria-label="First group"
-                    >
-                      <div className="col-4 mx-auto">
+          <Card.Title className="fs-4 mb-1">Your Account</Card.Title>
+          <Row className="mb-4">
+            {/* User Info */}
+            <Col xs={12} md={6} className="mb-3">
+              <Card className="">
+                <Card.Body>
+                  <Card.Text>
+                    <Row className="mb-3">
+                      <Col md={6}>
+                        <Card.Title>Account Number:</Card.Title>
+                        <Card.Title>{user.accountNumber}</Card.Title>
+                      </Col>
+                      <Col md={6} className="mt-3">
+                        Balance:
+                        <p className="fs-3">${user.balance}</p>
+                      </Col>
+                    </Row>
+                    <Row className="mb-3">
+                      <Col md={6}>
+                        Public Rate:
+                        <p className="fs-3">{user.public_rate}</p>
+                      </Col>
+                      <Col md={6}>
+                        Value:
+                        <p className="fs-3">{user.value}</p>
+                      </Col>
+                    </Row>
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            {/* Functions */}
+            <Col xs={12} md={6} className="mb-3">
+              <Card.Title className="fs-4 mb-1">
+                What do you want to do today?
+              </Card.Title>
+              <Card>
+                <Card.Body>
+                  <Card.Text>
+                    <Row className="mb-3">
+                      <Col md={12} className="mt-3">
                         <Button
                           onClick={() => handleShowModal("send")}
-                          className="btn btn-primary"
+                          className="w-100"
+                          style={{
+                            backgroundColor: "#c2cae4",
+                            color: "black",
+                            border: "none",
+                            padding: "10px 20px",
+                          }}
                         >
                           <FontAwesomeIcon icon={faArrowUp} className="me-2" />
-                          <br />
                           Send
                         </Button>
-                      </div>
-                      <div className="col-4 mx-auto">
+                      </Col>
+                      <Col md={12} className="mt-3">
                         <Button
                           onClick={() => handleShowModal("deposit")}
-                          className="btn btn-primary"
+                          className="btn w-100"
+                          style={{
+                            backgroundColor: "#c2cae4",
+                            color: "black",
+                            border: "none",
+                            padding: "10px 20px",
+                          }}
                         >
                           <FontAwesomeIcon icon={faWallet} className="me-2" />
-                          <br />
                           Deposit
                         </Button>
-                      </div>
-                      <div className="col-4 mx-auto">
+                      </Col>
+                      <Col md={12} className="mt-3">
                         <Button
                           onClick={() => handleShowModal("transfer")}
-                          className="btn btn-primary"
+                          className="btn w-100"
+                          style={{
+                            backgroundColor: "#c2cae4",
+                            color: "black",
+                            border: "none",
+                            padding: "10px 20px",
+                          }}
                         >
                           <FontAwesomeIcon
                             icon={faArrowDown}
                             className="me-2"
                           />
-                          <br />
-                          WithDraw
+                          Withdraw
                         </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Transaction History */}
-            <div className="row g-2">
-              <div className="row g-2">
-                <div className="col-6">
-                  <p className="fw-bold">Transaction History</p>
-                </div>
-                <div className="col-6">
-                  <a
-                    href="/transactionDetail"
-                    className="fw-bold text-decoration-none text-black"
-                  >
-                    See More
-                  </a>
-                </div>
-              </div>
-              <div className="transactions-section">
-                <ul>
-                  {user.transactionHistory &&
-                  user.transactionHistory.length > 0 ? (
-                    user.transactionHistory.map((transaction) => (
-                      <li key={transaction._id}>${transaction.amount}</li>
-                    ))
-                  ) : (
-                    <p>No transactions found.</p>
-                  )}
-                </ul>
-              </div>
-            </div>
-          </div>
-          {/* Modals Send */}
+                      </Col>
+                    </Row>
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Transaction History */}
+          {/* <Row className="mb-4">
+            <Col md={6}>
+              <p className="fw-bold">Transaction History</p>
+            </Col>
+            <Col md={6}>
+              <a
+                href="/transactionDetail"
+                className="fw-bold text-decoration-none text-black"
+              >
+                See More
+              </a>
+            </Col>
+          </Row>
+          <Card className="transactions-section">
+            <Card.Body>
+              <ul>
+                {user.transactionHistory &&
+                user.transactionHistory.length > 0 ? (
+                  user.transactionHistory.map((transaction) => (
+                    <li key={transaction._id}>${transaction.amount}</li>
+                  ))
+                ) : (
+                  <p>No transactions found.</p>
+                )}
+              </ul>
+            </Card.Body>
+          </Card> */}
+
+          {/* Modals */}
           <Modal show={showSendModal} onHide={() => handleCloseModal("send")}>
             <Modal.Header closeButton>
               <Modal.Title className="text-black">
@@ -400,7 +450,7 @@ export default function Dashboard() {
                     onChange={(e) => handleInputChange(e, setFormData)}
                   />
                 </Form.Group>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="w-100">
                   {isSubmitting ? (
                     <>
                       <Spinner
@@ -410,6 +460,7 @@ export default function Dashboard() {
                         role="status"
                         aria-hidden="true"
                       />
+                      Processing...
                     </>
                   ) : (
                     "Send"
@@ -419,7 +470,6 @@ export default function Dashboard() {
             </Modal.Body>
           </Modal>
 
-          {/* Modals Deposit */}
           <Modal
             show={showDepositModal}
             onHide={() => handleCloseModal("deposit")}
@@ -443,7 +493,7 @@ export default function Dashboard() {
                     required
                   />
                 </Form.Group>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="w-100">
                   {isSubmitting ? (
                     <>
                       <Spinner
@@ -453,6 +503,7 @@ export default function Dashboard() {
                         role="status"
                         aria-hidden="true"
                       />
+                      Processing...
                     </>
                   ) : (
                     "Deposit"
@@ -462,7 +513,6 @@ export default function Dashboard() {
             </Modal.Body>
           </Modal>
 
-          {/* Withdraw Modal */}
           <Modal
             show={showTransferModal}
             onHide={() => handleCloseModal("withdraw")}
@@ -486,7 +536,7 @@ export default function Dashboard() {
                     required
                   />
                 </Form.Group>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="w-100">
                   {isSubmitting ? (
                     <>
                       <Spinner
@@ -496,6 +546,7 @@ export default function Dashboard() {
                         role="status"
                         aria-hidden="true"
                       />
+                      Processing...
                     </>
                   ) : (
                     "Withdraw"
@@ -504,10 +555,10 @@ export default function Dashboard() {
               </Form>
             </Modal.Body>
           </Modal>
-        </div>
+        </>
       ) : (
         <p>No user data available.</p>
       )}
-    </div>
+    </Container>
   );
 }

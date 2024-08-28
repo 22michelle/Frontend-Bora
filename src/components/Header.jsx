@@ -1,25 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../App.css";
-import logo from "../../src/assets/logo2.png";
-import { Button } from "react-bootstrap";
+import logo from "../../src/assets/logo.png";
 
 export default function Header() {
-  // Function to close the toggler
   const closeToggler = () => {
-    const toggler = document.querySelector('.navbar-toggler');
-    const collapse = document.querySelector('#navbarNav');
-    if (collapse.classList.contains('show')) {
+    const toggler = document.querySelector(".navbar-toggler");
+    const collapse = document.querySelector("#navbarNav");
+    if (collapse.classList.contains("show")) {
       toggler.click();
     }
   };
 
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+    <nav className="navbar navbar-expand-lg fixed-top">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/" onClick={closeToggler}>
-          <img src={logo} alt="Bora" className="navbar-logo-img" />
-          <h2 className="mt-2">Bora</h2>
+          <img
+            src={logo}
+            alt="Bora"
+            className="navbar-logo-img"
+            style={{ fontFamily: "'Roboto', sans-serif", fontWeight: 800 }}
+          />
+          <h2 className="mt-2 d-inline">Bora</h2>
         </Link>
         <button
           className="navbar-toggler"
@@ -33,32 +35,49 @@ export default function Header() {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav">
+          <ul
+            className="navbar-nav ms-auto"
+            style={{
+              padding: "10px",
+            }}
+          >
             <li className="nav-item">
               <Link
                 to="/"
-                className="nav-link text-center mx-auto text-decoration-none"
+                className="nav-link text-center mx-auto me-2"
                 onClick={closeToggler}
+                style={{
+                  color: "black",
+                  textDecoration: "none",
+                }}
               >
                 Home
               </Link>
             </li>
             <li className="nav-item">
               <Link
-                to="/register"
-                className="nav-link text-center mx-auto text-decoration-none"
+                to="/login"
+                className="nav-link text-center mx-auto me-2"
                 onClick={closeToggler}
+                style={{
+                  color: "black",
+                  textDecoration: "none",
+                }}
               >
-                Register
+                Log In
               </Link>
             </li>
             <li className="nav-item">
               <Link
-                to="/login"
-                className="nav-link text-center mx-auto text-decoration-none"
+                to="/register"
+                className="nav-link text-center mx-auto me-2"
                 onClick={closeToggler}
+                style={{
+                  color: "black",
+                  textDecoration: "none",
+                }}
               >
-                Login
+                Sign Up
               </Link>
             </li>
           </ul>
