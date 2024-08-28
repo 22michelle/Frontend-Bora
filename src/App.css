@@ -142,3 +142,10 @@ body::-webkit-scrollbar-thumb {
 .form-control::placeholder {
   color: #515151;
 }
+
+@media (min-width: 768px) and (max-width: 991px) {
+  body {
+    padding: 0.75rem;
+  }
+
+}

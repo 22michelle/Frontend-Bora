@@ -297,7 +297,7 @@ export default function Dashboard() {
                       </Col>
                       <Col md={6} className="mt-3">
                         Balance:
-                        <p className="fs-3">${user.balance}</p>
+                        <p className="fs-3">${parseFloat(user.balance).toFixed(2)}</p>
                       </Col>
                     </Row>
                     <Row className="mb-3">
