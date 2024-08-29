@@ -17,7 +17,6 @@ import {
   faArrowUp,
   faArrowDown,
   faAngleRight,
-  faMoneyBill,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import HeaderLogout from "../components/Logout.jsx";
@@ -404,10 +403,7 @@ export default function Dashboard() {
                             padding: "10px 20px",
                           }}
                         >
-                          <FontAwesomeIcon
-                            icon={faArrowUp}
-                            className="me-2"
-                          />
+                          <FontAwesomeIcon icon={faArrowUp} className="me-2" />
                           Withdraw
                         </Button>
                       </Col>

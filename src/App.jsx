@@ -5,6 +5,7 @@ import Home from "../src/pages/Home.jsx";
 import Login from "../src/pages/Login.jsx";
 import Register from "../src/pages/Register.jsx";
 import Dashboard from "./pages/Dasboard.jsx";
+import Footer from "./components/Footer.jsx";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
 
@@ -39,6 +40,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
+      {location.pathname !== "/dashboard" && <Footer />}
     </>
   );
 }

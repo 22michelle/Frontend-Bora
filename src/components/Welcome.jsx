@@ -18,7 +18,7 @@ const Welcome = () => {
 
   return (
     <>
-      <Container className="">
+      <Container fluid className="px-5 py-5">
         <Row className="justify-content-center">
           <Col xs={12} md={6} className="text-center">
             <h2 className="mb-4" style={{ fontSize: "2rem", marginTop: "20%" }}>
