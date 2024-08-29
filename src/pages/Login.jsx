@@ -92,20 +92,18 @@ export default function Login() {
     <Container
       fluid
       className="p-6 py-6 "
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-          width: "100%",
-          padding: "6rem",
-        }}
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+        width: "100%",
+        padding: "6rem",
+      }}
     >
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={12} className="d-flex justify-content-center">
           <Card
-            className=""
-            className=""
             style={{
               padding: "5%",
               width: "300px",
