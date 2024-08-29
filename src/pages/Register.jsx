@@ -118,7 +118,7 @@ export default function Register() {
         }}
       >
         <Row className="justify-content-center">
-          <Col xs={12} md={6} lg={12} className="d-flex justify-content-center">
+          <Col xs={12} md={8} lg={12} className="d-flex justify-content-center">
             <Card
               className=""
               style={{
